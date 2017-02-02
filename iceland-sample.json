@@ -1,0 +1,95 @@
+{
+    "title": {
+        "media": {
+          "url": "media/IMG_6679.jpg",
+          "caption": "Here's the bold watchdog that came out of nowhere",
+          "credit": "James Lytle"
+        },
+        "text": {
+          "headline": "Timespan",
+          "text": "Testing this tool as a starting point to browse capture media files. It's interesing because it seems to already do a good job of spanning start and end times, which is useful for videos."
+        }
+    },
+    "events": [
+      {
+        "media": {
+          "url": "media/IMG_6683.jpg",
+          "credit": "James Lytle"
+        },
+        "start_date": {
+          "month": "1",
+          "day": "26",
+          "year": "2017",
+          "hour": "16",
+          "minute": "6",
+          "second": "9"
+        },
+        "text": {
+          "headline": "watchdog"
+        },
+        "group": "Camera1"
+      },
+      {
+        "media": {
+          "url": "media/IMG_6728.jpg",
+          "credit": "James Lytle"
+        },
+        "start_date": {
+          "month": "1",
+          "day": "26",
+          "year": "2017",
+          "hour": "16",
+          "minute": "21",
+          "second": "39"
+        },
+        "text": {
+          "headline": "mountain"
+        }, 
+        "group": "Camera1"
+      }, 
+      {
+        "media": {
+          "url": "media/IMG_6826.jpg",
+          "credit": "Someone else"
+        },
+        "start_date": {
+          "month": "1",
+          "day": "26",
+          "year": "2017",
+          "hour": "16",
+          "minute": "32",
+          "second": "09"
+        },
+        "text": {
+          "headline": "driving"
+        }, 
+        "group": "Camera2"
+      },
+      {
+        "media": {
+          "url": "media/dog.mov",
+          "credit": "Someone else"
+        },
+        "start_date": {
+          "month": "1",
+          "day": "26",
+          "year": "2017",
+          "hour": "16",
+          "minute": "06",
+          "second": "32"
+        },
+        "end_date": {
+          "month": "1",
+          "day": "26",
+          "year": "2017",
+          "hour": "16",
+          "minute": "07",
+          "second": "02"
+        },
+        "text": {
+          "headline": "dog video"
+        }, 
+        "group": "Camera2"
+      }
+    ]
+}
