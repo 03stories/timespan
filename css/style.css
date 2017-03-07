@@ -1,0 +1,75 @@
+.timeline {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  background-color: #eee;
+  color: #aaa;
+  padding: 5px;
+}
+.camera {
+  height: 50px;
+  border-top: 1px solid #ddd;
+}
+
+.camera-title {
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
+  text-shadow: #FFF 0 2px 2px;
+  border-right: 1px solid #ddd;
+  height: 100%;
+}
+
+.camera-items {
+  display: inline-block;
+  position: relative;
+  height: 100%;
+  width: 700px;
+}
+
+.camera-item {
+  display: inline-block;
+  position: absolute;
+  border: 1px solid #eee;
+}
+.camera-item.active {
+  border-color: #e6550d;
+}
+
+.timeline-guide {
+  position: relative;
+  width: 700px;
+  left: 200px;
+}
+
+
+.tick {
+  margin-top: 15px;
+}
+
+.tick.left {
+  border-left: 1px solid #ddd;
+  float: left;
+  padding-left: 5px;
+}
+
+.tick.right {
+  border-right: 1px solid #ddd;
+  float: right;
+  padding-right: 5px;
+}
+
+
+
+.timeline-slider {
+  position: absolute;
+  top: 0;
+  height: 200px;
+  border-left: 2px solid #aaa;
+}
+
+
+.timeline-details {
+  margin: 10px;
+  font-size: 20px;
+  margin-top: 40px;
+}
