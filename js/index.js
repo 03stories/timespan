@@ -8,65 +8,65 @@ let data = [
       {
         timestamp: 1440000000,
         type: 'photo',
-        url: 'http://www.icelandprocruises.co.uk/media/img/gallery/home/0002-gallery-iceland-waterfall-1.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_6679.jpg',
+        title: 'IMG_6679',
+        text: ''
       },
       {
-        timestamp: 1470606400,
+        timestamp: 1471606400,
         type: 'photo',
-        url: 'http://www.icelandprocruises.co.uk/media/img/gallery/home/0002-gallery-iceland-waterfall-1.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_6683.jpg',
+        title: 'IMG_6679',
+        text: ''
       },
       {
         timestamp: 1470340170,
         type: 'photo',
-        url: 'http://www.icelandprocruises.co.uk/media/img/gallery/home/0002-gallery-iceland-waterfall-1.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_6728.jpg',
+        title: 'IMG_6728',
+        text: ''
       },
       {
         timestamp: 1480340170,
         type: 'photo',
-        url: 'http://www.icelandprocruises.co.uk/media/img/gallery/home/0002-gallery-iceland-waterfall-1.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_6826.jpg',
+        title: 'IMG_6826',
+        text: ''
       },
       {
         timestamp: 1481490170,
         type: 'photo',
-        url: 'http://cdn.images.express.co.uk/img/dynamic/133/590x/travel-activity-Iceland-Northern-Lights-Reykjavik-UploadExpress-Sophie-Donnelly-637734.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_7016.jpg',
+        title: 'IMG_7016',
+        text: ''
       },
       {
         timestamp: 1482340170,
         type: 'photo',
-        url: 'http://www.icelandprocruises.co.uk/media/img/gallery/home/0002-gallery-iceland-waterfall-1.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_7128.jpg',
+        title: 'IMG_7128',
+        text: ''
       },
       {
         timestamp: 1483340170,
         type: 'photo',
-        url: 'http://cdn.images.express.co.uk/img/dynamic/133/590x/travel-activity-Iceland-Northern-Lights-Reykjavik-UploadExpress-Sophie-Donnelly-637734.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_7130.jpg',
+        title: 'IMG_7130',
+        text: ''
       },
       {
         timestamp: 1484340170,
         type: 'photo',
-        url: 'http://www.icelandprocruises.co.uk/media/img/gallery/home/0002-gallery-iceland-waterfall-1.jpg',
-        title: 'landscape',
-        text: 'short story long, a cool place, lorem ipsum, etc'
+        url: '../media/IMG_7132.jpg',
+        title: 'IMG_7132',
+        text: ''
       },
       {
         timestamp: 1485740170,
         type: 'photo',
-        url: 'http://cdn.images.express.co.uk/img/dynamic/133/590x/travel-activity-Iceland-Northern-Lights-Reykjavik-UploadExpress-Sophie-Donnelly-637734.jpg',
-        title: 'lights',
-        text: 'amazing view of northern lights'
+        url: '../media/IMG_7233.jpg',
+        title: 'IMG_7233',
+        text: ''
       },
     ]
   },
@@ -188,24 +188,14 @@ d3.select('.timeline').on('mousemove', function() {
   // update slider position
   slider.style('left', d3.event.pageX + 'px');
 
-  // var activeCam = d3.select('.camera');
-  // activeCam.attr('class', 'camera active');
-  
   // mark relevant cards active
   var xy = d3.mouse(guide);
   var dateX = xy[0];
   var date = xScale.invert(dateX);
   var mouseTimestamp = Math.floor(date.getTime()/1000);
   allItems.classed('active', d =>  Math.abs(d.timestamp - mouseTimestamp) < 500000);
-
-  // mark relevant rows active
-  // var xy = d3.mouse(guide);
-  // var dateX = xy[0];
-  // var date = xScale.invert(dateX);
-  // var mouseTimestamp = Math.floor(date.getTime()/1000);
-  // allItems.classed('active', d =>  Math.abs(d.timestamp - mouseTimestamp) < 1000000);
   
-  // update details with one active item's details
+  // update details with item's details from the active camera
   var active = d3.select('.camera.active .camera-item.active');
   if (active.size() === 0) {
     d3.select('.timeline-date').text('');
