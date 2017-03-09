@@ -67,6 +67,7 @@
   top: 0;
   height: 200px;
   border-left: 2px solid #aaa;
+  pointer-events: none;
 }
 
 

@@ -131,11 +131,12 @@ var cameraEnter = container.selectAll('.camera').data(data)
   .enter()
     .append('div')
     .attr('class','camera')
-    .on('mouseover', function () {
-      d3.select(this).attr('class', 'camera active');
+    // make 1 camera active based on hover
+    .on('mouseover', function () { 
+      d3.select(this).classed('active', true);
     })
     .on('mouseout', function () {
-      d3.select(this).attr('class', 'camera');
+      d3.select(this).classed('active', false);
     })
 ;
 cameraEnter.append('div').attr('class', 'camera-title');
