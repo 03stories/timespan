@@ -4,6 +4,7 @@
   background-color: #eee;
   color: #aaa;
   padding: 5px;
+  min-height: 1200px;
 }
 .camera {
   height: 50px;
@@ -75,4 +76,8 @@
   margin: 10px;
   font-size: 20px;
   margin-top: 40px;
+}
+
+#my-video {
+  display: none;
 }

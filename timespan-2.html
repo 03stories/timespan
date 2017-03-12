@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html >
+<html>
 <head>
   <meta charset="UTF-8">
   <title>James' timeline</title>
+  <link href="http://vjs.zencdn.net/5.17.0/video-js.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -30,12 +31,18 @@
       <div class="timeline-text"></div>
       <div class="timeline-image">
         <img height=500 src=""/>
+        <video id="my-video" width="640" height="320" autoplay="true" controls> <!--  To do: fix delay from trying to stream -->
+          <source src="" type="video/mp4">
+          <source src="" type="video/ogg">
+          Your browser does not support the video tag.
+        </video>
       </div>
     </div>
   </div>
   
   <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.5.0/d3.min.js'></script>
   <script src="js/index.js"></script>
+
 
 </body>
 </html>

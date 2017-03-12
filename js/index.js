@@ -94,10 +94,10 @@ let data = [
     items: [
       {
         timestamp: 1480110080,
-        type: 'photo',
-        url: 'http://cdn.images.express.co.uk/img/dynamic/133/590x/travel-activity-Iceland-Northern-Lights-Reykjavik-UploadExpress-Sophie-Donnelly-637734.jpg',
+        type: 'video',
+        url: '../media/dog.mp4',
         title: 'lights',
-        text: 'amazing view of northern lights'
+        text: 'some video'
       },
       {
         timestamp: 1481340180,
@@ -165,10 +165,11 @@ items.selectAll('.camera-item')
     .html(d => {
       if (d.type === 'photo') {
         return '<img height=50 width=50 src="' + d.url + '"/>';
+      } else if (d.type === 'video') {
+        return '<img height=50 width=50 src="../media/video.jpg"/>';
       } 
     })
 ;
-
 
 
 // add timeline dates at the bottom
@@ -202,13 +203,23 @@ d3.select('.timeline').on('mousemove', function() {
     d3.select('.timeline-title').text('');
     d3.select('.timeline-text').text('');
     d3.select('.timeline-image img').attr('src', '');
+    d3.select('#my-video').style('display', 'none');
+    d3.select('.timeline-image video').attr('src', '');
   } 
   else {
     let d = active.datum();
     d3.select('.timeline-date').text(dateFormatter(new Date(d.timestamp * 1000)));
     d3.select('.timeline-title').text(d.title);
     d3.select('.timeline-text').text(d.text);
-    d3.select('.timeline-image img').attr('src', d.url);
+    if (d.type === 'photo') {
+      d3.select('.timeline-image img').attr('height', '400');
+      d3.select('.timeline-image img').attr('src', d.url);
+    } else if (d.type === 'video') {
+      d3.select('.timeline-image img').attr('height', 0);
+      d3.select('.timeline-image video').attr('src', d.url);
+      d3.select('.timeline-image source').attr('src', d.url);
+      d3.select('#my-video').style('display', 'block');
+    }
   }
  
 })
