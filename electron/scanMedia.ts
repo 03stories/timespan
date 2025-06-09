@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import exifr from 'exifr';
-import ffprobe from 'ffprobe-static';
+import ffprobe from '@ffprobe-installer/ffprobe';
 import { execFile } from 'child_process';
 
 export interface MediaItem {
