@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Timeline } from './Timeline';
 import { scanMedia, MediaItem } from '../electron/scanMedia';
+import { scanMediaBrowser } from '../electron/scanMedia';
 
 declare global {
   interface Window {
@@ -18,10 +19,19 @@ export default function App() {
       const list = await window.electronAPI.pickDirectory();
       setItems(list);
     } else {
-      const dir = prompt('Enter path to directory');
-      if (!dir) return;
-      const result = await scanMedia(dir);
-      setItems(result);
+      // Browser mode - show file picker
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+      input.accept = '.jpg,.jpeg,.png,.mp4,.mov,.avi';
+      input.onchange = async (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (files && files.length > 0) {
+          const result = await scanMediaBrowser(files);
+          setItems(result);
+        }
+      };
+      input.click();
     }
   };
 
