@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Timeline } from './Timeline';
-import { scanMedia, MediaItem } from '../electron/scanMedia';
-import { scanMediaBrowser } from '../electron/scanMedia';
+import { scanMediaBrowser } from './scanMediaBrowser';
+import type { MediaItem } from './mediaTypes';
 
 declare global {
   interface Window {
@@ -36,10 +36,19 @@ export default function App() {
   };
 
   return (
-    <div>
-      <h1>Timespan</h1>
-      <button onClick={handlePick}>Pick Directory</button>
-      <Timeline items={items} />
+    <div className="app">
+      <header className="header">
+        <div className="title-block">
+          <h1 className="title">Timespan</h1>
+          <p className="subtitle">Scan a folder to map photos and videos onto a single timeline.</p>
+        </div>
+        <button className="primary" onClick={handlePick}>Pick Directory</button>
+      </header>
+      <section className="timeline-panel">
+        <div className="timeline-wrap">
+          <Timeline items={items} />
+        </div>
+      </section>
     </div>
   );
 }

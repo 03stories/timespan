@@ -1,19 +1,28 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const path = require('path');
-const { scanMedia } = require('./scanMedia');
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { scanMedia } from './scanMedia.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: true,
       contextIsolation: false
     }
   });
 
-  win.loadFile('index.html');
+  const devServerUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
+  if (process.env.NODE_ENV === 'development') {
+    win.loadURL(devServerUrl);
+  } else {
+    win.loadFile('dist/index.html');
+  }
 }
 
 app.whenReady().then(createWindow);

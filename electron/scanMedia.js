@@ -1,31 +1,22 @@
-import exifr from 'exifr';
-import fs from 'fs/promises';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import exifr from 'exifr';
 import ffprobeInstaller from '@ffprobe-installer/ffprobe';
-
-export interface MediaItem {
-  name: string;
-  path: string;
-  type: 'photo' | 'video';
-  timestamp: number;
-  end?: number;
-  thumbnailUrl?: string;
-}
 
 const execFileAsync = promisify(execFile);
 const PHOTO_EXTS = new Set(['jpg', 'jpeg', 'png']);
 const VIDEO_EXTS = new Set(['mp4', 'mov', 'avi']);
 
-function getStatTimeMs(stats: { birthtimeMs?: number; mtimeMs?: number; birthtime?: Date }) {
+function getStatTimeMs(stats) {
   if (typeof stats.birthtimeMs === 'number') return stats.birthtimeMs;
   if (typeof stats.mtimeMs === 'number') return stats.mtimeMs;
   if (stats.birthtime instanceof Date) return stats.birthtime.getTime();
   return Date.now();
 }
 
-async function getVideoDurationMs(filePath: string): Promise<number> {
+async function getVideoDurationMs(filePath) {
   const ffprobePath = ffprobeInstaller?.path;
   if (!ffprobePath) return 0;
   try {
@@ -45,9 +36,9 @@ async function getVideoDurationMs(filePath: string): Promise<number> {
   }
 }
 
-export async function scanMedia(dirPath: string): Promise<MediaItem[]> {
+export async function scanMedia(dirPath) {
   const entries = await fs.readdir(dirPath);
-  const items: MediaItem[] = [];
+  const items = [];
 
   for (const name of entries) {
     const ext = path.extname(name).slice(1).toLowerCase();
