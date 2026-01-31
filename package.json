@@ -1,0 +1,31 @@
+{
+  "name": "timespan",
+  "version": "1.0.0",
+  "description": "Interactive timeline viewer built with React and Vite",
+  "main": "electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "NODE_ENV=development VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "d3": "^7.8.0",
+    "electron": "^29.0.0",
+    "exifr": "^7.1.0",
+    "@ffprobe-installer/ffprobe": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "typescript": "^5.4.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}
