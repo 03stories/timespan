@@ -14,7 +14,8 @@ describe("scanMediaBrowser", () => {
   const originalCreateElement = document.createElement.bind(document);
 
   beforeEach(() => {
-    mockedExif.parse.mockImplementation(async (file: File) => {
+    mockedExif.parse.mockImplementation(async (data) => {
+      const file = data as File;
       if (file.name === "photo1.jpg") {
         return { DateTimeOriginal: "2021-02-01T00:00:00Z" } as any;
       }
