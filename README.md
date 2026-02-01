@@ -1,4 +1,4 @@
-# Timespan
+# Timespan (WIP!)
 
 This project renders an interactive timeline of photos and videos. It now uses **React**, **TypeScript** and **Vite** with **D3.js**. Media is scanned locally through Node.js/Electron. Video metadata relies on `@ffprobe-installer/ffprobe`.
 
