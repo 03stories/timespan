@@ -110,6 +110,7 @@ export function Timeline({ items }: Props) {
       .append("div")
       .attr("class", "tooltip")
       .style("opacity", "0");
+    const containerNode = ref.current;
 
     const g = svg.append("g");
 
@@ -175,9 +176,11 @@ export function Timeline({ items }: Props) {
           );
       })
       .on("mousemove", (event: MouseEvent) => {
+        if (!containerNode) return;
+        const rect = containerNode.getBoundingClientRect();
         tooltip
-          .style("left", `${event.offsetX + 14}px`)
-          .style("top", `${event.offsetY - 14}px`);
+          .style("left", `${event.clientX - rect.left + 14}px`)
+          .style("top", `${event.clientY - rect.top - 14}px`);
       })
       .on("mouseleave", () => {
         tooltip.style("opacity", "0");

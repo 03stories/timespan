@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Timeline } from './Timeline';
 import { scanMediaBrowser } from './scanMediaBrowser';
 import type { MediaItem } from './mediaTypes';
@@ -13,6 +13,16 @@ declare global {
 
 export default function App() {
   const [items, setItems] = useState<MediaItem[]>([]);
+
+  useEffect(() => {
+    return () => {
+      for (const item of items) {
+        if (item.thumbnailUrl?.startsWith('blob:')) {
+          URL.revokeObjectURL(item.thumbnailUrl);
+        }
+      }
+    };
+  }, [items]);
 
   const handlePick = async () => {
     if (window.electronAPI) {
