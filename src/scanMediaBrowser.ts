@@ -24,6 +24,7 @@ export async function scanMediaBrowser(files: FileList): Promise<MediaItem[]> {
     const file = files[i];
     const ext = file.name.split('.').pop()?.toLowerCase() || '';
     const objectUrl = URL.createObjectURL(file);
+    const filePath = file.webkitRelativePath || file.name;
 
     if (['jpg', 'jpeg', 'png'].includes(ext)) {
       try {
@@ -32,7 +33,7 @@ export async function scanMediaBrowser(files: FileList): Promise<MediaItem[]> {
         if (date) {
           items.push({
             name: file.name,
-            path: file.name,
+            path: filePath,
             type: 'photo',
             timestamp: new Date(date).getTime(),
             thumbnailUrl: objectUrl
@@ -40,7 +41,7 @@ export async function scanMediaBrowser(files: FileList): Promise<MediaItem[]> {
         } else {
           items.push({
             name: file.name,
-            path: file.name,
+            path: filePath,
             type: 'photo',
             timestamp: file.lastModified,
             thumbnailUrl: objectUrl
@@ -49,7 +50,7 @@ export async function scanMediaBrowser(files: FileList): Promise<MediaItem[]> {
       } catch {
         items.push({
           name: file.name,
-          path: file.name,
+          path: filePath,
           type: 'photo',
           timestamp: file.lastModified,
           thumbnailUrl: objectUrl
@@ -60,7 +61,7 @@ export async function scanMediaBrowser(files: FileList): Promise<MediaItem[]> {
       const duration = await getVideoDuration(file);
       items.push({
         name: file.name,
-        path: file.name,
+        path: filePath,
         type: 'video',
         timestamp: start,
         end: start + duration

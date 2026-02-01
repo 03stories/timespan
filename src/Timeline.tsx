@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import type { MediaItem } from './mediaTypes';
 
@@ -8,6 +8,33 @@ interface Props {
 
 export function Timeline({ items }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const zoomRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const node = ref.current;
+
+    const updateWidth = () => {
+      const nextWidth = node.clientWidth || 0;
+      setContainerWidth(prev => (prev === nextWidth ? prev : nextWidth));
+    };
+
+    updateWidth();
+
+    let resizeObserver: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => updateWidth());
+      resizeObserver.observe(node);
+    } else {
+      window.addEventListener('resize', updateWidth);
+    }
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, []);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -16,14 +43,56 @@ export function Timeline({ items }: Props) {
     svg.selectAll('*').remove();
     container.selectAll('.tooltip').remove();
 
-    const width = 800;
-    const height = 200;
+    const width = Math.max(360, containerWidth || ref.current.clientWidth || 800);
+    const margin = { top: 16, right: 24, bottom: 24, left: 150 };
+    const rowHeight = 84;
+    const rowGap = 6;
+    const axisOffset = 18;
+    const minThumbWidth = 84;
+    const thumbHeight = 56;
+
+    const normalizePath = (value: string) => value.replace(/\\/g, '/');
+    const getSourceKey = (item: MediaItem) => {
+      const rawPath = item.path || item.name;
+      const normalized = normalizePath(rawPath || '');
+      if (!normalized || !normalized.includes('/')) return 'browser';
+      return normalized.split('/').slice(0, -1).join('/');
+    };
+    const getSourceLabel = (sourceKey: string) => {
+      if (!sourceKey || sourceKey === 'browser') return 'Browser';
+      const normalized = normalizePath(sourceKey);
+      const parts = normalized.split('/').filter(Boolean);
+      return parts[parts.length - 1] || 'Media';
+    };
+
+    const grouped = d3.group(items, getSourceKey);
+    const groups = Array.from(grouped, ([key, groupItems]) => ({
+      key,
+      label: getSourceLabel(key),
+      items: groupItems
+    })).sort((a, b) => d3.ascending(a.key, b.key));
+    const rowCount = Math.max(1, groups.length);
+    const rowAreaHeight = rowCount * rowHeight + Math.max(0, rowCount - 1) * rowGap;
+    const axisY = margin.top + rowAreaHeight + axisOffset;
+    const height = axisY + margin.bottom;
     svg.attr('width', width).attr('height', height);
 
     const times = items.flatMap(d => [d.timestamp, d.end || d.timestamp]);
-    const min = d3.min(times) ?? Date.now();
-    const max = d3.max(times) ?? Date.now();
-    const x = d3.scaleTime().domain([new Date(min), new Date(max)]).range([40, width - 40]);
+    const fallback = Date.now();
+    const min = d3.min(times) ?? fallback - 1000 * 60 * 60 * 24;
+    const max = d3.max(times) ?? fallback;
+    const paddedMax = max === min ? max + 1000 * 60 * 60 : max;
+    const baseX = d3
+      .scaleTime()
+      .domain([new Date(min), new Date(paddedMax)])
+      .range([margin.left, width - margin.right]);
+
+    const rowIndexByKey = new Map(groups.map((group, index) => [group.key, index]));
+    const rowTopForItem = (item: MediaItem) => {
+      const key = getSourceKey(item);
+      const index = rowIndexByKey.get(key) ?? 0;
+      return margin.top + index * (rowHeight + rowGap);
+    };
 
     const tooltip = container
       .append('div')
@@ -32,14 +101,42 @@ export function Timeline({ items }: Props) {
 
     const g = svg.append('g');
 
-    // photo points
-    g.selectAll('circle')
-      .data(items.filter(d => d.type === 'photo'))
+    const rowGroup = g.append('g').attr('class', 'rows');
+    rowGroup
+      .selectAll('line.row-line')
+      .data(groups)
       .enter()
-      .append('circle')
-      .attr('cx', d => x(new Date(d.timestamp)))
-      .attr('cy', height / 2)
-      .attr('r', 5)
+      .append('line')
+      .attr('class', 'row-line')
+      .attr('x1', margin.left)
+      .attr('x2', width - margin.right)
+      .attr('y1', (_d, i) => margin.top + i * (rowHeight + rowGap))
+      .attr('y2', (_d, i) => margin.top + i * (rowHeight + rowGap));
+
+    rowGroup
+      .selectAll('text.row-label')
+      .data(groups)
+      .enter()
+      .append('text')
+      .attr('class', 'row-label')
+      .attr('x', margin.left - 12)
+      .attr('y', (_d, i) => margin.top + i * (rowHeight + rowGap) + rowHeight / 2)
+      .attr('text-anchor', 'end')
+      .attr('dominant-baseline', 'middle')
+      .text(d => d.label);
+
+    // photo points
+    const photoSelection = g.selectAll('image.photo')
+      .data(items.filter(d => d.type === 'photo' && d.thumbnailUrl))
+      .enter()
+      .append('image')
+      .attr('class', 'photo')
+      .attr('href', d => d.thumbnailUrl || '')
+      .attr('x', d => baseX(new Date(d.timestamp)))
+      .attr('y', d => rowTopForItem(d) + (rowHeight - thumbHeight) / 2)
+      .attr('width', minThumbWidth)
+      .attr('height', thumbHeight)
+      .attr('preserveAspectRatio', 'xMidYMid slice')
       .on('mouseenter', (event, d) => {
         if (!d.thumbnailUrl) return;
         tooltip
@@ -59,18 +156,42 @@ export function Timeline({ items }: Props) {
       });
 
     // video bars
-    g.selectAll('rect')
+    const videoSelection = g.selectAll('rect.video')
       .data(items.filter(d => d.type === 'video'))
       .enter()
       .append('rect')
-      .attr('x', d => x(new Date(d.timestamp)))
-      .attr('y', height / 2 - 5)
-      .attr('height', 10)
-      .attr('width', d => x(new Date(d.end ?? d.timestamp)) - x(new Date(d.timestamp)));
+      .attr('class', 'video')
+      .attr('x', d => baseX(new Date(d.timestamp)))
+      .attr('y', d => rowTopForItem(d) + rowHeight / 2 - 6)
+      .attr('height', 12)
+      .attr('width', d => baseX(new Date(d.end ?? d.timestamp)) - baseX(new Date(d.timestamp)));
 
-    const axis = d3.axisBottom(x);
-    svg.append('g').attr('transform', `translate(0,${height - 20})`).call(axis);
-  }, [items]);
+    const axis = d3.axisBottom(baseX);
+    const axisGroup = svg.append('g').attr('transform', `translate(0,${axisY})`).call(axis);
+
+    const applyTransform = (transform: d3.ZoomTransform) => {
+      const currentX = transform.rescaleX(baseX);
+      photoSelection.attr('x', d => currentX(new Date(d.timestamp)));
+      videoSelection
+        .attr('x', d => currentX(new Date(d.timestamp)))
+        .attr('width', d => currentX(new Date(d.end ?? d.timestamp)) - currentX(new Date(d.timestamp)));
+      axisGroup.call(axis.scale(currentX));
+    };
+
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.6, 160])
+      .translateExtent([[margin.left, 0], [width - margin.right, height]])
+      .on('zoom', (event) => {
+        zoomRef.current = event.transform;
+        applyTransform(event.transform);
+      });
+
+    svg.call(zoom as d3.ZoomBehavior<SVGSVGElement, unknown>);
+    svg.call(zoom.transform as any, zoomRef.current);
+
+    applyTransform(zoomRef.current);
+  }, [items, containerWidth]);
 
   return (
     <div className="timeline" ref={ref}>

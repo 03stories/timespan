@@ -39,7 +39,8 @@ body {
 }
 
 .app {
-  max-width: 1040px;
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
   display: grid;
   gap: 28px;
@@ -138,6 +139,15 @@ body {
   stroke: var(--ink-30);
 }
 
+.timeline svg .row-line {
+  stroke: var(--ink-20);
+}
+
+.timeline svg .row-label {
+  font-size: 12px;
+  fill: var(--ink-70);
+}
+
 .timeline svg circle {
   fill: var(--accent-100);
 }
@@ -146,6 +156,11 @@ body {
   fill: var(--accent-10);
   stroke: var(--accent-100);
   stroke-width: 1;
+}
+
+.timeline svg image.photo {
+  filter: drop-shadow(0 4px 8px rgba(15, 91, 90, 0.15));
+  opacity: 0.98;
 }
 
 .tooltip {
