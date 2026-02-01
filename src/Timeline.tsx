@@ -6,6 +6,12 @@ interface Props {
   items: MediaItem[];
 }
 
+type SourceGroup = {
+  key: string;
+  label: string;
+  items: MediaItem[];
+};
+
 export function Timeline({ items }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -39,7 +45,7 @@ export function Timeline({ items }: Props) {
   useEffect(() => {
     if (!ref.current) return;
     const container = d3.select(ref.current);
-    const svg = container.select("svg");
+    const svg = container.select<SVGSVGElement>("svg");
     svg.selectAll("*").remove();
     container.selectAll(".tooltip").remove();
 
@@ -69,7 +75,7 @@ export function Timeline({ items }: Props) {
     };
 
     const grouped = d3.group(items, getSourceKey);
-    const groups = Array.from(grouped, ([key, groupItems]) => ({
+    const groups: SourceGroup[] = Array.from(grouped, ([key, groupItems]) => ({
       key,
       label: getSourceLabel(key),
       items: groupItems,
@@ -116,8 +122,16 @@ export function Timeline({ items }: Props) {
       .attr("class", "row-line")
       .attr("x1", margin.left)
       .attr("x2", width - margin.right)
-      .attr("y1", (_d, i) => margin.top + i * (rowHeight + rowGap))
-      .attr("y2", (_d, i) => margin.top + i * (rowHeight + rowGap));
+      .attr(
+        "y1",
+        (_d: SourceGroup, i: number) =>
+          margin.top + i * (rowHeight + rowGap),
+      )
+      .attr(
+        "y2",
+        (_d: SourceGroup, i: number) =>
+          margin.top + i * (rowHeight + rowGap),
+      );
 
     rowGroup
       .selectAll("text.row-label")
@@ -128,11 +142,12 @@ export function Timeline({ items }: Props) {
       .attr("x", margin.left - 12)
       .attr(
         "y",
-        (_d, i) => margin.top + i * (rowHeight + rowGap) + rowHeight / 2,
+        (_d: SourceGroup, i: number) =>
+          margin.top + i * (rowHeight + rowGap) + rowHeight / 2,
       )
       .attr("text-anchor", "end")
       .attr("dominant-baseline", "middle")
-      .text((d) => d.label);
+      .text((d: SourceGroup) => d.label);
 
     // photo points
     const photoSelection = g
@@ -141,13 +156,16 @@ export function Timeline({ items }: Props) {
       .enter()
       .append("image")
       .attr("class", "photo")
-      .attr("href", (d) => d.thumbnailUrl || "")
-      .attr("x", (d) => baseX(new Date(d.timestamp)))
-      .attr("y", (d) => rowTopForItem(d) + (rowHeight - thumbHeight) / 2)
+      .attr("href", (d: MediaItem) => d.thumbnailUrl || "")
+      .attr("x", (d: MediaItem) => baseX(new Date(d.timestamp)))
+      .attr(
+        "y",
+        (d: MediaItem) => rowTopForItem(d) + (rowHeight - thumbHeight) / 2,
+      )
       .attr("width", minThumbWidth)
       .attr("height", thumbHeight)
       .attr("preserveAspectRatio", "xMidYMid slice")
-      .on("mouseenter", (event, d) => {
+      .on("mouseenter", (event: MouseEvent, d: MediaItem) => {
         if (!d.thumbnailUrl) return;
         tooltip
           .style("opacity", "1")
@@ -156,7 +174,7 @@ export function Timeline({ items }: Props) {
               `<img src="${d.thumbnailUrl}" alt="${d.name}" />`,
           );
       })
-      .on("mousemove", (event) => {
+      .on("mousemove", (event: MouseEvent) => {
         tooltip
           .style("left", `${event.offsetX + 14}px`)
           .style("top", `${event.offsetY - 14}px`);
@@ -172,12 +190,12 @@ export function Timeline({ items }: Props) {
       .enter()
       .append("rect")
       .attr("class", "video")
-      .attr("x", (d) => baseX(new Date(d.timestamp)))
-      .attr("y", (d) => rowTopForItem(d) + rowHeight / 2 - 6)
+      .attr("x", (d: MediaItem) => baseX(new Date(d.timestamp)))
+      .attr("y", (d: MediaItem) => rowTopForItem(d) + rowHeight / 2 - 6)
       .attr("height", 12)
       .attr(
         "width",
-        (d) =>
+        (d: MediaItem) =>
           baseX(new Date(d.end ?? d.timestamp)) - baseX(new Date(d.timestamp)),
       );
 
@@ -189,12 +207,15 @@ export function Timeline({ items }: Props) {
 
     const applyTransform = (transform: d3.ZoomTransform) => {
       const currentX = transform.rescaleX(baseX);
-      photoSelection.attr("x", (d) => currentX(new Date(d.timestamp)));
+      photoSelection.attr(
+        "x",
+        (d: MediaItem) => currentX(new Date(d.timestamp)),
+      );
       videoSelection
-        .attr("x", (d) => currentX(new Date(d.timestamp)))
+        .attr("x", (d: MediaItem) => currentX(new Date(d.timestamp)))
         .attr(
           "width",
-          (d) =>
+          (d: MediaItem) =>
             currentX(new Date(d.end ?? d.timestamp)) -
             currentX(new Date(d.timestamp)),
         );
@@ -208,13 +229,21 @@ export function Timeline({ items }: Props) {
         [margin.left, 0],
         [width - margin.right, height],
       ])
-      .on("zoom", (event) => {
+      .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         zoomRef.current = event.transform;
         applyTransform(event.transform);
       });
 
-    svg.call(zoom as d3.ZoomBehavior<SVGSVGElement, unknown>);
-    svg.call(zoom.transform as any, zoomRef.current);
+    const svgNode = svg.node();
+    const hasViewBoxBase =
+      svgNode &&
+      "viewBox" in svgNode &&
+      (svgNode as SVGSVGElement).viewBox?.baseVal;
+
+    if (hasViewBoxBase) {
+      svg.call(zoom);
+      svg.call(zoom.transform, zoomRef.current);
+    }
 
     applyTransform(zoomRef.current);
   }, [items, containerWidth]);
